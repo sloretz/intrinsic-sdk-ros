@@ -18,30 +18,59 @@
 #
 # This copyright notice shall be included in all copies or substantial portions of the software.
 
-# prevent multiple inclusion
-if(DEFINED _INTRINSIC_SDK_CMAKE_CMAKE_API_ALL_INCLUDED)
-  message(FATAL_ERROR "intrinsic_sdk_cmake/cmake/api/all.cmake included multiple times")
-endif()
-set(_INTRINSIC_SDK_CMAKE_CMAKE_API_ALL_INCLUDED TRUE)
+include_guard(GLOBAL)
 
-if(NOT DEFINED intrinsic_sdk_cmake_DIR)
-  message(FATAL_ERROR "intrinsic_sdk_cmake_DIR is unexpectedly not set")
-endif()
+#
+# Generate a skill bundle that can be deployed to Flowstate.
+#
+# :param MANIFEST: the path to the manifest file
+# :type MANIFEST: string
+# :param PROTOS_TARGET: the cmake target for generating the skill's proto files
+# :type PROTOS_TARGET: cmake target
+# :param SOURCES: the list of source files for the skill target
+# :type SOURCES: list of strings
+#
+# @public
+#
+function(intrinsic_sdk_generate_skill_bundle)
+set(options)
+set(one_value_args
+  TARGET
+  MANIFEST
+  PROTO_DESCRIPTOR_FILE
+  OCI_IMAGE
+  SKILL_BUNDLE_OUTPUT
+)
+set(multi_value_args)
 
-if(NOT DEFINED intrinsic_sdk_cmake_API_DIR)
-  set(intrinsic_sdk_cmake_API_DIR
-    "${intrinsic_sdk_cmake_DIR}/../../../share/intrinsic_sdk_cmake/cmake/api")
-endif()
+cmake_parse_arguments(
+  arg
+  "${options}"
+  "${one_value_args}"
+  "${multi_value_args}"
+  ${ARGN}
+)
 
-# Protobuf generation API
-include("${intrinsic_sdk_cmake_API_DIR}/intrinsic_sdk_protobuf_generate.cmake")
+set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-# Skill APIs
-include("${intrinsic_sdk_cmake_API_DIR}/skill/intrinsic_sdk_generate_skill.cmake")
-include("${intrinsic_sdk_cmake_API_DIR}/skill/intrinsic_sdk_generate_skill_config.cmake")
-include("${intrinsic_sdk_cmake_API_DIR}/skill/intrinsic_sdk_generate_skill_container_image.cmake")
-include("${intrinsic_sdk_cmake_API_DIR}/skill/intrinsic_sdk_generate_skill_main_cc.cmake")
-include("${intrinsic_sdk_cmake_API_DIR}/skill/intrinsic_sdk_generate_skill_bundle.cmake")
+# Generate the binary proto skill config
+add_custom_command(
+  OUTPUT ${arg_SKILL_BUNDLE_OUTPUT}
+  COMMAND inbuild_import
+  ARGS
+    skill bundle
+    --manifest=${arg_MANIFEST}
+    --file_descriptor_set=${arg_PROTO_DESCRIPTOR_FILE}
+    --oci_image=${arg_OCI_IMAGE}
+    --output=${arg_SKILL_BUNDLE_OUTPUT}
+  COMMENT "Generating skill config for ${arg_TARGET}"
+  DEPENDS
+    ${arg_PROTO_DESCRIPTOR_FILE}
+    ${arg_OCI_IMAGE}
+)
 
-# Service APIs
-include("${intrinsic_sdk_cmake_API_DIR}/service/intrinsic_sdk_generate_service_manifest.cmake")
+add_custom_target(${arg_TARGET} ALL
+  DEPENDS
+    ${arg_SKILL_BUNDLE_OUTPUT}
+)
+endfunction()

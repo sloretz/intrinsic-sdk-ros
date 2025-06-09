@@ -25,10 +25,8 @@ include_guard(GLOBAL)
 #
 # :param TARGET: the name for the target that generates the skill config file
 # :type TARGET: string
-# :param SKILL_NAME: the name of the skill
-# :type SKILL_NAME: string
-# :param MANIFEST_PBBIN: the path to the manifest file
-# :type MANIFEST_PBBIN: string
+# :param MANIFEST: the path to the manifest textproto file
+# :type MANIFEST: string
 # :param PROTO_DESCRIPTOR_FILE: the path to the proto descriptor file
 # :type PROTO_DESCRIPTOR_FILE: string
 # :param SKILL_CONFIG_FILE_OUTPUT: the output path for the skill config file
@@ -40,9 +38,7 @@ function(intrinsic_sdk_generate_skill_config)
   set(options)
   set(one_value_args
     TARGET
-    # TODO(wjwwood): extract skill name from manifest
-    SKILL_NAME
-    MANIFEST_PBBIN
+    MANIFEST
     PROTO_DESCRIPTOR_FILE
     SKILL_CONFIG_FILE_OUTPUT
   )
@@ -63,14 +59,15 @@ function(intrinsic_sdk_generate_skill_config)
     OUTPUT ${arg_SKILL_CONFIG_FILE_OUTPUT}
     # TODO(wjwwood): figure out why the alias does not work...
     # COMMAND intrinsic_sdk_cmake::skillserviceconfiggen_main
-    COMMAND skillserviceconfiggen_main_import
+    COMMAND inbuild_import
     ARGS
-      --manifest_pbbin_filename=${arg_MANIFEST_PBBIN}
-      --proto_descriptor_filename=${arg_PROTO_DESCRIPTOR_FILE}
-      --output_config_filename=${arg_SKILL_CONFIG_FILE_OUTPUT}
-    COMMENT "Generating skill config for ${arg_SKILL_NAME}"
+      skill generate config
+      --manifest=${arg_MANIFEST}
+      --file_descriptor_set=${arg_PROTO_DESCRIPTOR_FILE}
+      --output=${arg_SKILL_CONFIG_FILE_OUTPUT}
+    COMMENT "Generating skill config for ${arg_TARGET}"
     DEPENDS
-      ${arg_MANIFEST_PBBIN}
+      ${arg_MANIFEST}
       ${arg_PROTO_DESCRIPTOR_FILE}
   )
 
