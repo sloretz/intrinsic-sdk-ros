@@ -26,10 +26,10 @@ install(
   DESTINATION bin
 )
 # Create an imported executable and namespace it to imitate find_package()
-add_executable(skillbundlegen_import IMPORTED)
-set_target_properties(skillbundlegen_import
+add_executable(inbuild_import IMPORTED)
+set_target_properties(inbuild_import
   PROPERTIES
     IMPORTED_LOCATION "${sdk_bins_DIR}/inbuild"
 )
-add_dependencies(skillbundlegen_import inbuild)
+add_dependencies(inbuild_import inbuild)
 add_executable(${PROJECT_NAME}::inbuild ALIAS inbuild_import)

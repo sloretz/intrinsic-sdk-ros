@@ -120,7 +120,7 @@ function(intrinsic_sdk_generate_skill_container_image)
       --build-arg SKILL_EXECUTABLE=${arg_SKILL_EXECUTABLE}
       --build-arg SKILL_CONFIG=${arg_SKILL_CONFIG}
       --build-arg SKILL_ASSET_ID_ORG=${arg_SKILL_ASSET_ID_ORG}
-      --tag {arg_CONTAINER_TAG_NAME}
+      --tag ${arg_CONTAINER_TAG_NAME}
       .
     COMMAND podman save
       --format="docker-archive"

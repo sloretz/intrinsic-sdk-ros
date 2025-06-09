@@ -70,5 +70,3 @@ intrinsic_sdk_generate_skill_bundle(
   OCI_IMAGE "${CMAKE_CURRENT_BINARY_DIR}/test_cpp_skill_container_image.tar"
   SKILL_BUNDLE_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test_cpp_skill.bundle.tar"
 )
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/test_cpp_skill.bundle.tar" DESTINATION share/${PROJECT_NAME})
